@@ -84,7 +84,7 @@ output/
 Markdown files in HouseMD support metadata at the top of the file, which helps determine the template to use and populate variables in the template. Below is an example of how to write metadata in a Markdown file:
 
 ### Input Markdown File (`index.md`):
-```markdown
+````markdown
 TEMPLATE: index.html
 TITLE: Index
 
@@ -93,7 +93,7 @@ TITLE: Index
 ``` python
 print("Hello, World!")
 ```
-```
+````
 
 ### Explanation:
 1. **TEMPLATE**: Specifies the HTML template to use (e.g., `index.html`), *required*.
