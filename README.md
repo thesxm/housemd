@@ -123,12 +123,6 @@ The resulting HTML will look like this:
 </html>
 ```
 
-## How It Works
-
-1. **Markdown to HTML Conversion**: All `.md` files are read, processed using the `markdown` library, and saved as `.html` files. Metadata from the `.md` files is extracted and used to determine the appropriate template and populate template variables.
-2. **Template Integration**: The translated HTML content is inserted into the specified template. Metadata variables are replaced within the template.
-3. **File Copying**: Non-Markdown files are copied directly to the output directory without any modifications.
-
 ## Contributing
 
 Contributions are welcome! Feel free to submit issues or pull requests to improve HouseMD.
