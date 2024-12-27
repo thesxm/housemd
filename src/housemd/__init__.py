@@ -5,3 +5,5 @@ __all__ = [
         "Generator",
         "build"
 ]
+
+version = "0.0.1"
