@@ -2,8 +2,26 @@ from .generator import Generator
 from os import path, listdir, mkdir
 from shutil import rmtree, copy
 import queue
+import json
 
-def build(source_dir, out_dir, template_dir):
+def update_metadatabase(mdb, file_path, md):
+    key_arr = file_path.split(path.sep)
+    _ = mdb
+
+    for k in key_arr[:-1]:
+        if k not in _:
+            _[k] = dict()
+
+        _ = _[k]
+
+    _[key_arr[-1]] = md
+
+def build(source_dir, out_dir, template_dir, metadatabase_path):
+    """
+    Build the static website
+
+    metadatabase_path is the absolute path of the metadatabase file, it must contain the file name in the end. If metadatabase_path is None metadatabase is not dumped.
+    """
     source_dir = path.abspath(source_dir)
     out_dir = path.abspath(out_dir)
     template_dir = path.abspath(template_dir)
@@ -30,21 +48,30 @@ def build(source_dir, out_dir, template_dir):
             else:
                 static_file_paths.put(y)
 
-    # Use Generator to generate html files of the md files in md_paths queue and store them in out_dir
+    # Use Generator to generate html files of the md files in md_paths queue and store them in out_dir while updating the metadatabase
     
     g = Generator(template_dir)
+    mdb = dict()
+
     while not md_paths.empty():
         _ = md_paths.get()
-        res = g(path.join(source_dir, _))
+        res, metadata = g(path.join(source_dir, _))
         y = path.splitext(_)
         y = "".join(y[:-1]) + ".html"
-        y = path.join(out_dir, y)
 
-        with open(y, "w") as f:
+        with open(path.join(out_dir, y), "w") as f:
             f.write(res)
+
+        update_metadatabase(mdb, y, metadata)
 
     # Copy all static files
     
     while not static_file_paths.empty():
         _ = static_file_paths.get()
         copy(path.join(source_dir, _), path.join(out_dir, _))
+
+    # Dump the metadatabase
+
+    if metadatabase_path is not None:
+        with open(path.join(out_dir, metadatabase_path), "w") as f:
+            f.write(json.dumps(mdb))

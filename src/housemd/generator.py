@@ -39,7 +39,7 @@ class Generator:
         m = extension_returns["metadata"]
         res = template_txt.replace("{{ CONTENT }}", html_txt)
 
-        for key, val in m:
+        for key, val in m.items():
             res = res.replace("{{ " + key.upper() + " }}", m[key][0])
 
         return res 
@@ -55,4 +55,4 @@ class Generator:
         html_txt, ext_outs = self._md_to_html(md)
         template_txt = self._get_template_txt(ext_outs["metadata"]["template"][0])
 
-        return self._compile(template_txt, html_txt, ext_outs)
+        return self._compile(template_txt, html_txt, ext_outs), ext_outs["metadata"]
