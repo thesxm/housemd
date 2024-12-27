@@ -79,6 +79,49 @@ output/
 └── images/
     └── logo.png
 ```
+## Metadata Example
+
+Markdown files in HouseMD support metadata at the top of the file, which helps determine the template to use and populate variables in the template. Below is an example of how to write metadata in a Markdown file:
+
+### Input Markdown File (`index.md`):
+```markdown
+TEMPLATE: index.html
+TITLE: Index
+
+# Hello, World
+
+``` python
+print("Hello, World!")
+```
+```
+
+### Explanation:
+1. **TEMPLATE**: Specifies the HTML template to use (e.g., `index.html`), *required*.
+2. **TITLE**: A variable that can be used in the template (e.g., for the `<title>` tag).
+3. The rest of the Markdown content will be converted into HTML and inserted into the designated template.
+
+### Output HTML (`index.html`):
+Assuming a simple `index.html` template like this:
+```html
+<html>
+<head><title>{{ TITLE }}</title></head>
+<body>
+    <div>{{ CONTENT }}</div>
+</body>
+</html>
+```
+The resulting HTML will look like this:
+```html
+<html>
+<head><title>Index</title></head>
+<body>
+    <div>
+        <h1>Hello, World</h1>
+        <pre><code class="language-python">print("Hello, World!")</code></pre>
+    </div>
+</body>
+</html>
+```
 
 ## How It Works
 
