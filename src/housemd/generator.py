@@ -37,8 +37,10 @@ class Generator:
         """
 
         m = extension_returns["metadata"]
-        res = template_txt.replace("{{ TITLE }}", m["title"][0])
-        res = res.replace("{{ CONTENT }}", html_txt)
+        res = template_txt.replace("{{ CONTENT }}", html_txt)
+
+        for key, val in m:
+            res = res.replace("{{ " + key.upper() + " }}", m[key][0])
 
         return res 
 
