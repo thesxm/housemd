@@ -4,7 +4,7 @@ HouseMD is a simple and lightweight static site generator written in Python. Ins
 
 ## Features
 
-- Converts Markdown files into HTML using the `markdown` library.
+- Converts Markdown files into HTML using the `markdown` library, all [standard extensions](https://python-markdown.github.io/extensions/) are enabled.
 - Supports templates for consistent HTML formatting.
 - Extracts and utilizes metadata from Markdown files.
 - Retains the original directory structure of the input folder.
