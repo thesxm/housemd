@@ -5,7 +5,17 @@ class Generator:
     def __init__(self, template_dir):
         "Initialize the Generator Object"
 
-        self._md = markdown.Markdown(extensions = ["meta", "extra"])
+        self._md = markdown.Markdown(extensions = [
+            "extra",
+            "admonition",
+            "codehilite",
+            "meta",
+            "nl2br",
+            "sane_lists",
+            "smarty",
+            "toc",
+            "wikilinks"
+        ])
         self._template_dir = template_dir
 
     def _md_to_html(self, md_txt):
