@@ -1,4 +1,5 @@
 import markdown
+from markdown_katex import makeExtension as markdown_katex_ext
 from os import path
 
 class Generator:
@@ -14,7 +15,8 @@ class Generator:
             "sane_lists",
             "smarty",
             "toc",
-            "wikilinks"
+            "wikilinks",
+            markdown_katex_ext(),
         ])
         self._template_dir = template_dir
 
