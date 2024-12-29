@@ -29,13 +29,13 @@ Run the `housemd` package from the command line with up to four arguments:
 4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
 
 ```bash
-python -m housemd <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
+housemd <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
 ```
 
 ### Example
 
 ```bash
-python -m housemd ./my-website ./output ./templates ./metadata.json
+housemd ./my-website ./output ./templates ./metadata.json
 ```
 
 ### What Happens?
