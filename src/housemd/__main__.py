@@ -5,6 +5,8 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from time import sleep, time
 import threading
+from http.server import SimpleHTTPRequestHandler
+import socketserver
 
 def _build():
     source_path, output_path, templates_path = map(path.abspath, sys.argv[1:4])
@@ -46,10 +48,26 @@ class Handler(FileSystemEventHandler):
         self.build_sched[0] = threading.Timer(3, self.__schedule_build, args = [self.build_sched])
         self.build_sched[0].start()
 
+def _run_http_server(_):
+    _.serve_forever()
+    _.server_close()
+
 def _live():
     source_path, output_path, templates_path = map(path.abspath, sys.argv[1:4])
     
     _build()
+
+    class StaticServerHandler(SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, directory=output_path, **kwargs)
+
+    http_server = socketserver.TCPServer(("", 8000), StaticServerHandler)
+    server_thread = threading.Thread(target = _run_http_server, args = [http_server])
+    server_thread.start()
+
+    print("Static file server running")
+    print(f"\tfrom: {output_path}")
+    print(f"\tat: http://localhost:{8000}")
 
     observer = Observer()
     handler = Handler()
@@ -66,6 +84,8 @@ def _live():
     except BaseException as e:
         print(f"ERROR: {e}")
         observer.stop()
+        http_server.shutdown()
     finally:
         observer.join()
+        server_thread.join()
         print("Stopped listening.")
