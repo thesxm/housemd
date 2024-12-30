@@ -38,11 +38,11 @@ Builds the static site and actively monitors the source and template directories
 housemd-live <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
 ```
 
--The arguments are explained:
--1. **Source Directory**: The directory containing your Markdown files and other assets.
--2. **Output Directory**: The directory where the static site will be generated.
--3. **Template Directory**: The directory containing HTML templates.
--4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
+The arguments are explained:
+1. **Source Directory**: The directory containing your Markdown files and other assets.
+2. **Output Directory**: The directory where the static site will be generated.
+3. **Template Directory**: The directory containing HTML templates.
+4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
 
 ### Example
 
