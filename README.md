@@ -32,7 +32,7 @@ housemd-build <source_directory> <output_directory> <template_directory> [<metad
 ```
 
 ### 2. `housemd-live`
-Builds the static site and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
+Builds the static site, starts a static server on the output_path and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
 
 ```bash
 housemd-live <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
