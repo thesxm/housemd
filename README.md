@@ -22,20 +22,33 @@ pip install git+https://github.com/thesxm/housemd
 
 ## Usage
 
-Run the `housemd` package from the command line with up to four arguments:
-1. **Source Directory**: The directory containing your Markdown files and other assets.
-2. **Output Directory**: The directory where the static site will be generated.
-3. **Template Directory**: The directory containing HTML templates.
-4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
+HouseMD provides two main commands:
+
+### 1. `housemd-build`
+Builds the static site by processing the source directory and generating the output directory.
 
 ```bash
-housemd <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
+housemd-build <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
 ```
+
+### 2. `housemd-live`
+Builds the static site and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
+
+```bash
+housemd-live <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
+```
+
+-The arguments are explained:
+-1. **Source Directory**: The directory containing your Markdown files and other assets.
+-2. **Output Directory**: The directory where the static site will be generated.
+-3. **Template Directory**: The directory containing HTML templates.
+-4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
 
 ### Example
 
 ```bash
-housemd ./my-website ./output ./templates ./metadata.json
+housemd-build ./my-website ./output ./templates ./metadata.json
+housemd-live ./my-website ./output ./templates ./metadata.json
 ```
 
 ### What Happens?
@@ -140,3 +153,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 - Inspired by the amazing TV show "House, M.D."
 - Built with the simplicity and power of Python and the `markdown` library.
+
