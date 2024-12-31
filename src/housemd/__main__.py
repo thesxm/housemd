@@ -71,6 +71,10 @@ def _create_server_handler_class(output_path):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=output_path, **kwargs)
 
+        def end_headers(self):
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            super().end_headers()
+
     return _
 
 def _live():
