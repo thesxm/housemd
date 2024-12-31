@@ -25,6 +25,7 @@ def build(source_dir, out_dir, template_dir, metadatabase_path):
     source_dir = path.abspath(source_dir)
     out_dir = path.abspath(out_dir)
     template_dir = path.abspath(template_dir)
+    metadatabase_path = path.abspath(metadatabase_path) if metadatabase_path is not None else None
 
     # Clean the out_dir generate all sub directories, also create the queue of markdown files and static files (using BFS)
 
@@ -73,5 +74,5 @@ def build(source_dir, out_dir, template_dir, metadatabase_path):
     # Dump the metadatabase
 
     if metadatabase_path is not None:
-        with open(path.join(out_dir, metadatabase_path), "w") as f:
+        with open(metadatabase_path, "w") as f:
             f.write(json.dumps(mdb))
