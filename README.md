@@ -28,27 +28,39 @@ HouseMD provides two main commands:
 Builds the static site by processing the source directory and generating the output directory.
 
 ```bash
-housemd-build <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
+housemd-build <config_file_path>
 ```
 
 ### 2. `housemd-live`
-Builds the static site, starts a static server on the output_path and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
+Builds the static site, starts a static server on the output path and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
 
 ```bash
-housemd-live <source_directory> <output_directory> <template_directory> [<metadatabase_path>]
+housemd-live <config_file_path>
 ```
 
-The arguments are explained:
-1. **Source Directory**: The directory containing your Markdown files and other assets.
-2. **Output Directory**: The directory where the static site will be generated.
-3. **Template Directory**: The directory containing HTML templates.
-4. *(Optional)* **Metadata Output Path**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
+Both commands take the path of a config file as an argument. The config file must follow the JSON format.
+
+The config json should contain the following keys:
+1. **source**: The directory containing your Markdown files and other assets.
+2. **output**: The directory where the static site will be generated.
+3. **templates**: The directory containing HTML templates.
+4. *(Optional)* **mdb**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
 
 ### Example
+Assuming a simple `housemd-config.json`:
+```json
+{
+    "source": "./my-website",
+    "output": "./output",
+    "templates": "./templates",
+    "mdb": "metadatabase.json"
+}
+```
 
+You can execute `housemd` commands as such:
 ```bash
-housemd-build ./my-website ./output ./templates ./metadata.json
-housemd-live ./my-website ./output ./templates ./metadata.json
+housemd-build ./housemd-config.json
+housemd-live ./housemd-config.json
 ```
 
 ### What Happens?
