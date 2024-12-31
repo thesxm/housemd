@@ -44,7 +44,7 @@ The config json should contain the following keys:
 1. **source**: The directory containing your Markdown files and other assets.
 2. **output**: The directory where the static site will be generated.
 3. **templates**: The directory containing HTML templates.
-4. *(Optional)* **mdb**: If provided, the metadata of all translated files will be dumped as a JSON file to this path within the output directory.
+4. *(Optional)* **mdb**: If provided, the metadata of all translated files will be dumped as a JSON file to this path.
 
 ### Example
 Assuming a simple `housemd-config.json`:
@@ -53,7 +53,7 @@ Assuming a simple `housemd-config.json`:
     "source": "./my-website",
     "output": "./output",
     "templates": "./templates",
-    "mdb": "metadatabase.json"
+    "mdb": "./output/metadatabase.json"
 }
 ```
 
