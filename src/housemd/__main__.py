@@ -7,18 +7,32 @@ from time import sleep, time
 import threading
 from http.server import SimpleHTTPRequestHandler
 import socketserver
+import json
+
+def _parse_config(config_file_path):
+    config_data = json.load(open(config_file_path, "r"))
+
+    try:
+        for _ in ["source", "output", "templates"]:
+            config_data[_] = path.abspath(config_data[_])
+    except KeyError as e:
+        raise BaseException(f"Invalid config file {config_file_path}, missing key {e.args[0]}")
+
+    if "mdb" in config_data:
+        config_data["mdb"] = path.abspath(config_data["mdb"])
+    else:
+        config_data["mdb"] = None
+
+    return config_data
 
 def _build():
-    source_path, output_path, templates_path = map(path.abspath, sys.argv[1:4])
-    mdb = None
-    if len(sys.argv) > 4:
-        mdb = sys.argv[4]
+    configs = _parse_config(sys.argv[1])
 
-    print(f"building", end = "...")
-    build(source_path, output_path, templates_path, mdb)
-    print(f" done.")
+    print("building...")
+    build(configs["source"], configs["output"], configs["templates"], configs["mdb"])
+    print("\tdone.")
 
-class Handler(FileSystemEventHandler):
+class EventHandler(FileSystemEventHandler):
     def __init__(self):
         super().__init__()
         self.build_sched = [None, 0]  # the build thread and build running status
@@ -52,31 +66,34 @@ def _run_http_server(_):
     _.serve_forever()
     _.server_close()
 
-def _live():
-    source_path, output_path, templates_path = map(path.abspath, sys.argv[1:4])
-    
-    _build()
-
-    class StaticServerHandler(SimpleHTTPRequestHandler):
+def _create_server_handler_class(output_path):
+    class _(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=output_path, **kwargs)
 
-    http_server = socketserver.TCPServer(("", 8000), StaticServerHandler)
+    return _
+
+def _live():
+    configs = _parse_config(sys.argv[1])
+    
+    _build()
+
+    http_server = socketserver.TCPServer(("", 8000), _create_server_handler_class(configs["output"]))
     server_thread = threading.Thread(target = _run_http_server, args = [http_server])
     server_thread.start()
 
     print("Static file server running")
-    print(f"\tfrom: {output_path}")
+    print(f"\tserving: {configs['output']}")
     print(f"\tat: http://localhost:{8000}")
 
     observer = Observer()
-    handler = Handler()
+    handler = EventHandler()
 
-    observer.schedule(handler, source_path, recursive = True)
-    observer.schedule(handler, templates_path, recursive = True)
+    observer.schedule(handler, configs["source"], recursive = True)
+    observer.schedule(handler, configs["templates"], recursive = True)
 
     observer.start()
-    print(f"listening for changes in {source_path} and {templates_path}")
+    print(f"listening for changes in source [{configs['source']} and templates [{configs['templates']}] directories")
 
     try:
         while observer.is_alive():
