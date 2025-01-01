@@ -23,6 +23,11 @@ def _parse_config(config_file_path):
     else:
         config_data["mdb"] = None
 
+    if "port" in config_data:
+        config_data["port"] = int(config_data["port"])
+    else:
+        config_data["port"] = None
+
     return config_data
 
 def _build():
@@ -75,10 +80,13 @@ def _create_server_handler_class(output_path):
 
 def _live():
     configs = _parse_config(sys.argv[1])
+    if configs["port"] is None:
+        print("port not specified in config file!")
+        exit(1)
     
     _build()
 
-    http_server = socketserver.TCPServer(("", 8000), _create_server_handler_class(configs["output"]))
+    http_server = socketserver.TCPServer(("", configs["port"]), _create_server_handler_class(configs["output"]))
     server_thread = threading.Thread(target = _run_http_server, args = [http_server])
     server_thread.start()
 
