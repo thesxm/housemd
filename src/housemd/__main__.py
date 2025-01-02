@@ -1,116 +1,37 @@
-import sys
 from .builder import build
+from .live import live
 from os import path
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
-from time import sleep, time
-import threading
-from http.server import SimpleHTTPRequestHandler
-import socketserver
 import json
+import sys
 
-def _parse_config(config_file_path):
-    config_data = json.load(open(config_file_path, "r"))
+def preprocess_configs(configs):
+    for k in ["source", "output", "templates"]:
+        if k not in configs:
+            raise BaseException(f"Config file missing required key `{k}`")
 
-    try:
-        for _ in ["source", "output", "templates"]:
-            config_data[_] = path.abspath(config_data[_])
-    except KeyError as e:
-        raise BaseException(f"Invalid config file {config_file_path}, missing key {e.args[0]}")
+        configs[k] = path.abspath(configs[k])
 
-    if "mdb" in config_data:
-        config_data["mdb"] = path.abspath(config_data["mdb"])
-    else:
-        config_data["mdb"] = None
+    configs["mdb"] = None if "mdb" not in configs else path.abspath(configs["mdb"])
+    configs["port"] = 0 if "port" not in configs else int(configs["port"])
+    configs["trigger_threshold"] = 3 if "trigger_threshold" not in configs else float(configs["trigger_threshold"])
 
-    if "port" in config_data:
-        config_data["port"] = int(config_data["port"])
-    else:
-        config_data["port"] = None
+    return configs
 
-    return config_data
+def get_configs(configs_path):
+    return preprocess_configs(json.load(open(configs_path, "r")))
+
+def get_configs_path():
+    if len(sys.argv) != 2:
+        raise BaseException("Invalid syntax!")
+
+    return path.abspath(sys.argv[1])
 
 def _build():
-    configs = _parse_config(sys.argv[1])
+    configs = get_configs(get_configs_path())
 
-    print("building...")
     build(configs["source"], configs["output"], configs["templates"], configs["mdb"])
-    print("\tdone.")
-
-class EventHandler(FileSystemEventHandler):
-    def __init__(self):
-        super().__init__()
-        self.build_sched = [None, 0]  # the build thread and build running status
-
-    def __schedule_build(self, _):
-        _[1] = 1
-        _build()
-        _[0] = None
-        _[1] = 0
-
-    def on_any_event(self, e):
-        VALID_EVENTS = ["created", "modified", "deleted", "moved"]
-        if e.event_type not in VALID_EVENTS or e.is_directory or e.src_path.endswith(".swp"):
-            return
-
-        if self.build_sched[0] is None:
-            print()
-            print(e.event_type, e.src_path, e.dest_path if e.event_type == "moved" else "")
-        else:
-            print(e.event_type, e.src_path, e.dest_path if e.event_type == "moved" else "")
-            if self.build_sched[1]:
-                self.build_sched[0].join()
-            else:
-                self.build_sched[0].cancel()
-                self.build_sched[0] = None
-
-        self.build_sched[0] = threading.Timer(3, self.__schedule_build, args = [self.build_sched])
-        self.build_sched[0].start()
-
-def _run_http_server(_):
-    _.serve_forever()
-    _.server_close()
-
-def _create_server_handler_class(output_path):
-    class _(SimpleHTTPRequestHandler):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, directory=output_path, **kwargs)
-
-    return _
 
 def _live():
-    configs = _parse_config(sys.argv[1])
-    if configs["port"] is None:
-        print("port not specified in config file!")
-        exit(1)
-    
-    _build()
+    configs = get_configs(get_configs_path())
 
-    http_server = socketserver.TCPServer(("", configs["port"]), _create_server_handler_class(configs["output"]))
-    server_thread = threading.Thread(target = _run_http_server, args = [http_server])
-    server_thread.start()
-
-    print("Static file server running")
-    print(f"\tserving: {configs['output']}")
-    print(f"\tat: http://localhost:{8000}")
-
-    observer = Observer()
-    handler = EventHandler()
-
-    observer.schedule(handler, configs["source"], recursive = True)
-    observer.schedule(handler, configs["templates"], recursive = True)
-
-    observer.start()
-    print(f"listening for changes in source [{configs['source']} and templates [{configs['templates']}] directories")
-
-    try:
-        while observer.is_alive():
-            sleep(1)
-    except BaseException as e:
-        print(f"ERROR: {e}")
-        observer.stop()
-        http_server.shutdown()
-    finally:
-        observer.join()
-        server_thread.join()
-        print("Stopped listening.")
+    live(configs["source"], configs["output"], configs["templates"], configs["mdb"], configs["port"], configs["trigger_threshold"])

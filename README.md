@@ -45,6 +45,8 @@ The config json should contain the following keys:
 2. **output**: The directory where the static site will be generated.
 3. **templates**: The directory containing HTML templates.
 4. *(Optional)* **mdb**: If provided, the metadata of all translated files will be dumped as a JSON file to this path.
+5. *(Optional)* **port**: The port on which housemd-live http server should run. Defaults to whatever port is given by the Operating System.
+6. *(Optional)* **trigger_threshold**: Amount of time to wait after the last change is detected by housemd-live before re-building the site. Defaults to 3 seconds.
 
 ### Example
 Assuming a simple `housemd-config.json`:
@@ -104,9 +106,9 @@ output/
 ├── assets/
 │   ├── styles.css
 │   └── script.js
-└── images/
-    └── logo.png
-├── metadata.json (if metadatabase_path is provided)
+├── images/
+│   └── logo.png
+└── metadata.json (if metadatabase_path is provided)
 ```
 
 ## Metadata Example
