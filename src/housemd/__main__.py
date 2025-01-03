@@ -1,5 +1,6 @@
 from .builder import build
 from .live import live
+from .init import init
 from os import path
 import json
 import sys
@@ -35,3 +36,6 @@ def _live():
     configs = get_configs(get_configs_path())
 
     live(configs["source"], configs["output"], configs["templates"], configs["mdb"], configs["port"], configs["trigger_threshold"])
+
+def _init():
+    init()
