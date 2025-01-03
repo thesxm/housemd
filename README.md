@@ -22,23 +22,14 @@ pip install git+https://github.com/thesxm/housemd
 
 ## Usage
 
-HouseMD provides two main commands:
+HouseMD provides three main commands:
 
-### 1. `housemd-build`
-Builds the static site by processing the source directory and generating the output directory.
-
-```bash
-housemd-build <config_file_path>
-```
-
-### 2. `housemd-live`
-Builds the static site, starts a static server on the output path and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
+### 1. `housemd-init`
+Generates the configuration file for `housemd` commands to use.
 
 ```bash
-housemd-live <config_file_path>
+housemd-init
 ```
-
-Both commands take the path of a config file as an argument. The config file must follow the JSON format.
 
 The config json should contain the following keys:
 1. **source**: The directory containing your Markdown files and other assets.
@@ -47,6 +38,22 @@ The config json should contain the following keys:
 4. *(Optional)* **mdb**: If provided, the metadata of all translated files will be dumped as a JSON file to this path.
 5. *(Optional)* **port**: The port on which housemd-live http server should run. Defaults to whatever port is given by the Operating System.
 6. *(Optional)* **trigger_threshold**: Amount of time to wait after the last change is detected by housemd-live before re-building the site. Defaults to 3 seconds.
+
+### 2. `housemd-build`
+Builds the static site by processing the source directory and generating the output directory.
+
+```bash
+housemd-build <config_file_path>
+```
+
+### 3. `housemd-live`
+Builds the static site, starts a static server on the output path and actively monitors the source and template directories for changes. If any changes are detected, it rebuilds the static site 3 seconds after the last detected change, resetting the timer if new changes occur during this interval. This command takes the same arguments as the `housemd-build` command:
+
+```bash
+housemd-live <config_file_path>
+```
+
+Both `housemd-build` and `housemd-init` commands take the path of the config file as an argument.
 
 ### Example
 Assuming a simple `housemd-config.json`:
