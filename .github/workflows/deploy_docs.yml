@@ -2,7 +2,7 @@ name: Deploy documentation
 on:
   push:
     branches:
-      - 'docs'
+      - 'master'
   workflow_dispatch:
 jobs:
   build:
