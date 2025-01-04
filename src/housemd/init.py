@@ -1,4 +1,4 @@
-from os import mkdir, path
+from os import chdir, mkdir, path
 import json
 
 def _take_input(q, default):
@@ -13,10 +13,10 @@ def init():
 
     _ = _take_input("Config file name (housemd-config.json): ", "housemd-config.json")
     print("\n{")
-    configs["source"] = path.abspath(_take_input("\tSource directory path (content): ", "content"))
-    configs["output"] = path.abspath(_take_input("\tOutput direcotry path (public): ", "public"))
-    configs["templates"] = path.abspath(_take_input("\tTemplates directory path (templates): ", "templates"))
-    configs["mdb"] = path.abspath(_take_input(f"\tMetadatabase path ({configs['output']}/mdb.json): ", path.join(configs["output"], "mdb.json")))
+    configs["source"] = path.relpath(_take_input("\tSource directory path (content): ", "content"))
+    configs["output"] = path.relpath(_take_input("\tOutput direcotry path (public): ", "public"))
+    configs["templates"] = path.relpath(_take_input("\tTemplates directory path (templates): ", "templates"))
+    configs["mdb"] = path.relpath(_take_input(f"\tMetadatabase path ({configs['output']}/mdb.json): ", path.join(configs["output"], "mdb.json")))
     configs["port"] = int(_take_input("\thousemd-live HTTP server port (None, automatically assigned): ", 0))
     configs["trigger_threshold"] = float(_take_input("\thousemd-live trigger threshold (2 seconds): ", 2.0))
     print("}\n")

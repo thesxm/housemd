@@ -1,0 +1,1 @@
+{"source": "content", "output": "public", "templates": "templates", "mdb": "public/mdb.json", "port": 0, "trigger_threshold": 2.0}
