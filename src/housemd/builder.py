@@ -29,7 +29,10 @@ def build(source_dir, out_dir, template_dir, metadatabase_path):
 
     # Clean the out_dir generate all sub directories, also create the queue of markdown files and static files (using BFS)
 
-    rmtree(out_dir)
+    try:
+        rmtree(out_dir)
+    except:
+        pass
 
     subdir_paths = queue.Queue()
     md_paths = queue.Queue()
