@@ -17,6 +17,19 @@ def update_metadatabase(mdb, file_path, md):
 
     _[key_arr[-1]] = md
 
+def _run_thread(ind, source_dir, out_dir, template_dir, md_paths, mdb_queue):
+        g = Generator(template_dir)
+        while not md_paths.empty():
+            _ = md_paths.get()
+            res, metadata = g(path.join(source_dir, _))
+            y = path.splitext(_)
+            y = "".join(y[:-1]) + ".html"
+
+            with open(path.join(out_dir, y), "w") as f:
+                f.write(res)
+
+            mdb_queue.put((y, metadata))
+
 def build(source_dir, out_dir, template_dir, metadatabase_path, build_thread_count):
     """
     Build the static website
@@ -56,32 +69,23 @@ def build(source_dir, out_dir, template_dir, metadatabase_path, build_thread_cou
 
     # Use Generator to generate html files of the md files in md_paths queue and store them in out_dir while updating the metadatabase
     
-    g = Generator(template_dir)
-
-    def _run_thread(md_paths, mdb_queue):
-        while not md_paths.empty():
-            _ = md_paths.get()
-            res, metadata = g(path.join(source_dir, _))
-            y = path.splitext(_)
-            y = "".join(y[:-1]) + ".html"
-
-            with open(path.join(out_dir, y), "w") as f:
-                f.write(res)
-
-            mdb_queue.put((y, metadata))
-
     build_threads = []
     for i in range(build_thread_count):
         try:
-            t = threading.Thread(target = _run_thread, args = (md_paths, mdb_queue))
+            t = threading.Thread(target = _run_thread, args = (i, source_dir, out_dir, template_dir, md_paths, mdb_queue))
             t.start()
         except:
-            printf("Error while spawning thread, skipping.")
+            print("Error while spawning thread, skipping.")
         else:
             build_threads.append(t)
 
-    for i in range(len(build_threads)):
-        build_threads[i].join()
+    if len(build_threads) > 0:
+        print(f"spawned {len(build_threads)} threads.")
+        for i in range(len(build_threads)):
+            build_threads[i].join()
+    else:  # If no threads were able to be spawned, build in the current thread
+        print(f"failed to spawn any new thread, building in the current one.")
+        _run_thread(-1, source_dir, out_dir, template_dir, md_paths, mdb_queue)
 
     mdb = dict()
     while not mdb_queue.empty():

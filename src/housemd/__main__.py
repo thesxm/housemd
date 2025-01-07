@@ -15,7 +15,7 @@ def preprocess_configs(configs):
     configs["mdb"] = None if "mdb" not in configs else path.abspath(configs["mdb"])
     configs["port"] = 0 if "port" not in configs else int(configs["port"])
     configs["trigger_threshold"] = 3 if "trigger_threshold" not in configs else float(configs["trigger_threshold"])
-    configs["build_thread_count"] = 1 if "build_threads" not in configs else int(configs["build_thread_count"])
+    configs["build_thread_count"] = 1 if "build_thread_count" not in configs else int(configs["build_thread_count"])
 
     return configs
 
