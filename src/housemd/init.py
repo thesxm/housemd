@@ -19,6 +19,7 @@ def init():
     configs["mdb"] = path.relpath(_take_input(f"\tMetadatabase path ({configs['output']}/mdb.json): ", path.join(configs["output"], "mdb.json")))
     configs["port"] = int(_take_input("\thousemd-live HTTP server port (None, automatically assigned): ", 0))
     configs["trigger_threshold"] = float(_take_input("\thousemd-live trigger threshold (2 seconds): ", 2.0))
+    configs["build_thread_count"] = int(_take_input("\tBuild thread count (1): ", 1))
     print("}\n")
 
     for k in ["source", "output", "templates"]:

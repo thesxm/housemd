@@ -1,1 +1,1 @@
-{"source": "docs/content", "output": "docs/public", "templates": "docs/templates", "mdb": "docs/public/mdb.json", "port": 8080, "trigger_threshold": 2.0}
+{"source": "docs/content", "output": "docs/public", "templates": "docs/templates", "mdb": "docs/public/mdb.json", "port": 0, "trigger_threshold": 2.0, "build_thread_count": 1}
