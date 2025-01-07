@@ -15,6 +15,7 @@ def preprocess_configs(configs):
     configs["mdb"] = None if "mdb" not in configs else path.abspath(configs["mdb"])
     configs["port"] = 0 if "port" not in configs else int(configs["port"])
     configs["trigger_threshold"] = 3 if "trigger_threshold" not in configs else float(configs["trigger_threshold"])
+    configs["build_thread_count"] = 1 if "build_threads" not in configs else int(configs["build_thread_count"])
 
     return configs
 
@@ -30,12 +31,12 @@ def get_configs_path():
 def _build():
     configs = get_configs(get_configs_path())
 
-    build(configs["source"], configs["output"], configs["templates"], configs["mdb"])
+    build(configs["source"], configs["output"], configs["templates"], configs["mdb"], configs["build_thread_count"])
 
 def _live():
     configs = get_configs(get_configs_path())
 
-    live(configs["source"], configs["output"], configs["templates"], configs["mdb"], configs["port"], configs["trigger_threshold"])
+    live(configs["source"], configs["output"], configs["templates"], configs["mdb"], configs["port"], configs["trigger_threshold"], configs["build_thread_count"])
 
 def _init():
     init()

@@ -3,6 +3,7 @@ from os import path, listdir, mkdir
 from shutil import rmtree, copy
 import queue
 import json
+import threading
 
 def update_metadatabase(mdb, file_path, md):
     key_arr = file_path.split(path.sep)
@@ -16,7 +17,7 @@ def update_metadatabase(mdb, file_path, md):
 
     _[key_arr[-1]] = md
 
-def build(source_dir, out_dir, template_dir, metadatabase_path):
+def build(source_dir, out_dir, template_dir, metadatabase_path, build_thread_count):
     """
     Build the static website
 
@@ -36,6 +37,7 @@ def build(source_dir, out_dir, template_dir, metadatabase_path):
 
     subdir_paths = queue.Queue()
     md_paths = queue.Queue()
+    mdb_queue = queue.Queue()
     static_file_paths = queue.Queue()
 
     subdir_paths.put("")
@@ -55,18 +57,35 @@ def build(source_dir, out_dir, template_dir, metadatabase_path):
     # Use Generator to generate html files of the md files in md_paths queue and store them in out_dir while updating the metadatabase
     
     g = Generator(template_dir)
+
+    def _run_thread(md_paths, mdb_queue):
+        while not md_paths.empty():
+            _ = md_paths.get()
+            res, metadata = g(path.join(source_dir, _))
+            y = path.splitext(_)
+            y = "".join(y[:-1]) + ".html"
+
+            with open(path.join(out_dir, y), "w") as f:
+                f.write(res)
+
+            mdb_queue.put((y, metadata))
+
+    build_threads = []
+    for i in range(build_thread_count):
+        try:
+            t = threading.Thread(target = _run_thread, args = (md_paths, mdb_queue))
+            t.start()
+        except:
+            printf("Error while spawning thread, skipping.")
+        else:
+            build_threads.append(t)
+
+    for i in range(len(build_threads)):
+        build_threads[i].join()
+
     mdb = dict()
-
-    while not md_paths.empty():
-        _ = md_paths.get()
-        res, metadata = g(path.join(source_dir, _))
-        y = path.splitext(_)
-        y = "".join(y[:-1]) + ".html"
-
-        with open(path.join(out_dir, y), "w") as f:
-            f.write(res)
-
-        update_metadatabase(mdb, y, metadata)
+    while not mdb_queue.empty():
+        update_metadatabase(mdb, *mdb_queue.get())
 
     # Copy all static files
     

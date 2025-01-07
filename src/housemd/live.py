@@ -7,8 +7,8 @@ from time import sleep
 import threading
 
 class FSEHandler(FileSystemEventHandler):
-    def __init__(self, source_path, output_path, templates_path, mdb_path, trigger_threshold, *args, **kwargs):
-        self.build_configs = [source_path, output_path, templates_path, mdb_path]
+    def __init__(self, source_path, output_path, templates_path, mdb_path, trigger_threshold, build_thread_count, *args, **kwargs):
+        self.build_configs = [source_path, output_path, templates_path, mdb_path, build_thread_count]
         self.trigger_threshold = trigger_threshold
         self._build_scheduler = [0, None]
 
@@ -44,9 +44,9 @@ class FSEHandler(FileSystemEventHandler):
 
         self._trigger_build()
 
-def create_observer(source_path, output_path, templates_path, mdb_path, trigger_threshold):
+def create_observer(source_path, output_path, templates_path, mdb_path, trigger_threshold, build_thread_count):
     observer = Observer()
-    handler = FSEHandler(source_path, output_path, templates_path, mdb_path, trigger_threshold)
+    handler = FSEHandler(source_path, output_path, templates_path, mdb_path, trigger_threshold, build_thread_count)
 
     observer.schedule(handler, source_path, recursive = True)
     observer.schedule(handler, templates_path, recursive = True)
@@ -68,28 +68,27 @@ def create_http_server(output_path, port):
 
     return server
 
-def live(source_path, output_path, templates_path, mdb_path, port, trigger_threshold):
-    observer = create_observer(source_path, output_path, templates_path, mdb_path, trigger_threshold)
+def live(source_path, output_path, templates_path, mdb_path, port, trigger_threshold, build_thread_count):
+    observer = create_observer(source_path, output_path, templates_path, mdb_path, trigger_threshold, build_thread_count)
     server = create_http_server(output_path, port)
 
     server_thread = threading.Thread(target = server.serve_forever, daemon = True)
     
     print("initial build started.")
-    build(source_path, output_path, templates_path, mdb_path)
+    build(source_path, output_path, templates_path, mdb_path, build_thread_count)
     print("done.")
     print()
+    observer.start()
     print("Observing file changes in:")
     print(f"\tSource Directory: {source_path}")
     print(f"\tTemplates Directory: {templates_path}")
     print(f"\tTrigger Threshold: {trigger_threshold}")
     print()
+    server_thread.start()
     print("Starting HTTP server with configs:")
     print(f"\tDirectory: {output_path}")
     print(f"\tAddress: http://localhost:{server.server_address[1]}")
     print()
-
-    observer.start()
-    server_thread.start()
 
     try:
         while all([observer.is_alive(), server_thread.is_alive()]):
